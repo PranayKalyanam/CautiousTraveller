@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "913361219866",
+    "project_id": "cautious-traveller",
+    "storage_bucket": "cautious-traveller.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:913361219866:android:49a9ea4b21300c7fee7ca3",
+        "android_client_info": {
+          "package_name": "com.example.cautioustraveller"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDMnOIf7dctzmyrnbsBkpdPFeOv116yu0M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
