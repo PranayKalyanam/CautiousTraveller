@@ -43,6 +43,7 @@ public class CreateFragment extends Fragment {
     private static final int REQUEST_CODE_CAMERA_PERMISSION = 1001;
 
     private EditText captionEditText;
+    private EditText locationEditText; // New location input field
     private ImageView imageView;
     private Button takePhotoButton, uploadButton;
     private Uri selectedImageUri;
@@ -61,6 +62,7 @@ public class CreateFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_create, container, false);
 
         captionEditText = view.findViewById(R.id.caption_edit_text);
+        locationEditText = view.findViewById(R.id.location_edit_text); // Initialize the location input field
         imageView = view.findViewById(R.id.image_view);
         takePhotoButton = view.findViewById(R.id.take_photo_button);
         uploadButton = view.findViewById(R.id.upload_button);
@@ -71,7 +73,8 @@ public class CreateFragment extends Fragment {
         // Set up the upload button click listener
         uploadButton.setOnClickListener(v -> {
             String caption = captionEditText.getText().toString();
-            uploadImageToFirebase(caption);
+            String location = locationEditText.getText().toString(); // Get the location input
+            uploadImageToFirebase(caption, location); // Pass location to the upload method
         });
 
         // Initialize Firebase Storage and Firestore
@@ -150,14 +153,14 @@ public class CreateFragment extends Fragment {
         );
     }
 
-    private void uploadImageToFirebase(String caption) {
+    private void uploadImageToFirebase(String caption, String location) { // Updated method signature
         if (selectedImageUri != null) {
             String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
             StorageReference fileReference = storageReference.child("posts/" + userId + "/" + selectedImageUri.getLastPathSegment());
             fileReference.putFile(selectedImageUri)
                     .addOnSuccessListener(taskSnapshot -> fileReference.getDownloadUrl().addOnSuccessListener(uri -> {
                         String imageUrl = uri.toString();
-                        savePostToFirestore(caption, imageUrl);
+                        savePostToFirestore(caption, location, imageUrl); // Pass location to Firestore method
                     }))
                     .addOnFailureListener(e -> {
                         Toast.makeText(requireContext(), "Upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -167,36 +170,53 @@ public class CreateFragment extends Fragment {
         }
     }
 
-    private void savePostToFirestore(String caption, String imageUrl) {
+    private void savePostToFirestore(String caption, String location, String imageUrl) { // Updated method signature
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        Map<String, Object> post = new HashMap<>();
-        post.put("userId", userId);
-        post.put("caption", caption);
-        post.put("imageUrl", imageUrl);
 
-        // Add the post to the "posts" collection
-        firestore.collection("posts")
-                .add(post)
-                .addOnSuccessListener(documentReference -> {
-                    String postId = documentReference.getId(); // Get the ID of the newly created post
+        // Get reference to the user document
+        DocumentReference userRef = firestore.collection("users").document(userId);
 
-                    // Get reference to the user document
-                    DocumentReference userRef = firestore.collection("users").document(userId);
+        // Retrieve the username from the user document
+        userRef.get().addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String username = documentSnapshot.getString("username");
 
-                    // Update the "posts" array field of the user document
-                    userRef.update("posts", FieldValue.arrayUnion(postId))
-                            .addOnSuccessListener(aVoid -> {
-                                Toast.makeText(requireContext(), "Post uploaded successfully", Toast.LENGTH_SHORT).show();
-                                // Optionally clear the UI elements after successful upload
-                                captionEditText.setText("");
-                                imageView.setImageURI(null);
-                            })
-                            .addOnFailureListener(e -> {
-                                Toast.makeText(requireContext(), "Failed to update user document: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                            });
+                        // Create the post object with username
+                        Map<String, Object> post = new HashMap<>();
+                        post.put("userId", userId);
+                        post.put("username", username); // Add username to post
+                        post.put("caption", caption);
+                        post.put("location", location); // Add location to post
+                        post.put("imageUrl", imageUrl);
+
+                        // Add the post to the "posts" collection
+                        firestore.collection("posts")
+                                .add(post)
+                                .addOnSuccessListener(documentReference -> {
+                                    String postId = documentReference.getId(); // Get the ID of the newly created post
+
+                                    // Update the "posts" array field of the user document
+                                    userRef.update("posts", FieldValue.arrayUnion(postId))
+                                            .addOnSuccessListener(aVoid -> {
+                                                Toast.makeText(requireContext(), "Post uploaded successfully", Toast.LENGTH_SHORT).show();
+                                                // Optionally clear the UI elements after successful upload
+                                                captionEditText.setText("");
+                                                locationEditText.setText(""); // Clear location input
+                                                imageView.setImageURI(null);
+                                            })
+                                            .addOnFailureListener(e -> {
+                                                Toast.makeText(requireContext(), "Failed to update user document: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                            });
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(requireContext(), "Failed to save post: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                });
+                    } else {
+                        Toast.makeText(requireContext(), "User document does not exist", Toast.LENGTH_SHORT).show();
+                    }
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(requireContext(), "Failed to save post: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), "Failed to retrieve user document: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
 }
