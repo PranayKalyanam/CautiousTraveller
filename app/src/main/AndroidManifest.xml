@@ -2,8 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-<<<<<<< HEAD
-=======
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
@@ -11,7 +9,6 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
->>>>>>> 14a1561 (create post)
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -22,10 +19,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CautiousTraveller"
         tools:targetApi="31">
-<<<<<<< HEAD
-=======
 
->>>>>>> 14a1561 (create post)
+
         <activity
             android:name=".HomeActivity"
             android:exported="false" />
@@ -34,7 +29,6 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-<<<<<<< HEAD
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
@@ -42,22 +36,3 @@
     </application>
 
 </manifest>
-=======
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="com.example.cautioustraveller.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
-        </provider>
-
-    </application>
-
-</manifest>
->>>>>>> 14a1561 (create post)
