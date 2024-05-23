@@ -33,7 +33,7 @@ public class HomeActivity extends AppCompatActivity {
                     selectedFragment = new FeedFragment();
                 } else if (itemId == R.id.navigation_create) {
                     selectedFragment = new CreateFragment();
-                } else if (itemId == R.id.navigation_map) {
+                } else if (itemId == R.id.navigation_search) {
                     selectedFragment = new MapFragment();
                 }
                 if (selectedFragment != null) {
