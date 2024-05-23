@@ -11,12 +11,14 @@
         android:scaleType="centerCrop"
         />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/take_photo_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/image_view"
         android:layout_marginTop="16dp"
+        android:background="@drawable/button_toggle"
+        android:fontFamily="sans-serif-condensed-light"
         android:text="Take Photo" />
 
     <EditText
@@ -25,6 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/take_photo_button"
         android:layout_marginTop="16dp"
+        android:fontFamily="sans-serif-black"
         android:hint="Enter a caption"
         android:inputType="textMultiLine"
         android:lines="3" />
@@ -35,15 +38,26 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/caption_edit_text"
         android:layout_marginTop="16dp"
+        android:fontFamily="sans-serif-black"
         android:hint="Enter location"
         android:inputType="text" />
 
-    <Button
+    <ProgressBar
+        android:id="@+id/loading_progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"/>
+
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/upload_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/location_edit_text"
         android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/button_toggle"
+        android:fontFamily="sans-serif-condensed-light"
         android:text="Upload" />
 
 </RelativeLayout>

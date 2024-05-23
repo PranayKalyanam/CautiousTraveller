@@ -6,13 +6,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -22,8 +23,8 @@ public class MainActivity extends AppCompatActivity {
     private EditText username;
     private EditText email;
     private EditText password;
-    private Button actionButton;
-    private Button toggleButton;
+    private AppCompatButton actionButton;
+    private AppCompatButton toggleButton;
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
@@ -34,6 +35,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            openHomePage();
+            finish();
+        }
 
         username = findViewById(R.id.username);
         email = findViewById(R.id.email);
@@ -55,9 +61,9 @@ public class MainActivity extends AppCompatActivity {
                 String passwordText = password.getText().toString();
                 if (isSigningUp) {
                     String usernameText = username.getText().toString();
-                    signUp(emailText, passwordText, usernameText);
+                    signUp(emailText, passwordText, usernameText, v);
                 } else {
-                    login(emailText, passwordText);
+                    login(emailText, passwordText, v);
                 }
             }
         });
@@ -79,10 +85,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void signUp(String email, String password, String username) {
+    private void signUp(String email, String password, String username, View view) {
         // Check if email is in valid format
         if (!isValidEmail(email)) {
-            Toast.makeText(MainActivity.this, "Invalid email address.", Toast.LENGTH_SHORT).show();
+            Snackbar.make(view, "Invalid email address.", Snackbar.LENGTH_SHORT).show();
             return;
         }
 
@@ -94,10 +100,10 @@ public class MainActivity extends AppCompatActivity {
                             Log.d("MainActivity", "createUserWithEmail:success");
                             saveUserData(email, username);
                             openHomePage();
+                            Snackbar.make(view, "SignUp successful.", Snackbar.LENGTH_SHORT).show();
                         } else {
                             Log.w("MainActivity", "createUserWithEmail:failure", task.getException());
-                            Toast.makeText(MainActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                            Snackbar.make(view, "Authentication failed.", Snackbar.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -107,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
-    private void login(String email, String password) {
+    private void login(String email, String password, View view) {
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -115,10 +121,10 @@ public class MainActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             Log.d("MainActivity", "signInWithEmail:success");
                             openHomePage();
+                            Snackbar.make(view, "Login Successful", Snackbar.LENGTH_SHORT).show();
                         } else {
                             Log.w("MainActivity", "signInWithEmail:failure", task.getException());
-                            Toast.makeText(MainActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+                            Snackbar.make(view, "Invalid/Wrong Credentials", Snackbar.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -148,9 +154,10 @@ public class MainActivity extends AppCompatActivity {
     public static class User {
         public String email;
         public String username;
+
         public User(String email, String username) {
             this.email = email;
-            this.username=username;
+            this.username = username;
         }
     }
 }

@@ -36,6 +36,12 @@ public class FeedFragment extends Fragment {
     private LinearLayout feedLayout;
     private ProgressBar loadingProgressBar;
     private FirebaseFirestore firestore;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        firestore = FirebaseFirestore.getInstance();
+        loadPosts();
+    }
 
     @Nullable
     @Override
@@ -45,9 +51,11 @@ public class FeedFragment extends Fragment {
         loadingProgressBar = view.findViewById(R.id.loading_progress_bar);
         loadingProgressBar.setVisibility(View.VISIBLE); // Show progress bar immediately
         firestore = FirebaseFirestore.getInstance();
-        loadPosts();
+
         return view;
     }
+
+
 
     private void loadPosts() {
         firestore.collection("posts")

@@ -13,12 +13,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
@@ -45,7 +47,7 @@ public class CreateFragment extends Fragment {
     private EditText captionEditText;
     private EditText locationEditText; // New location input field
     private ImageView imageView;
-    private Button takePhotoButton, uploadButton;
+    private AppCompatButton takePhotoButton, uploadButton;
     private Uri selectedImageUri;
     private String currentPhotoPath;
 
@@ -55,6 +57,7 @@ public class CreateFragment extends Fragment {
     private FirebaseStorage firebaseStorage;
     private StorageReference storageReference;
     private FirebaseFirestore firestore;
+    private ProgressBar uploadProgressBar;
 
     @Nullable
     @Override
@@ -84,6 +87,8 @@ public class CreateFragment extends Fragment {
 
         setupCameraPermissionLauncher();
         setupTakePhotoLauncher();
+
+        uploadProgressBar = view.findViewById(R.id.loading_progress_bar);
 
         return view;
     }
@@ -155,17 +160,21 @@ public class CreateFragment extends Fragment {
 
     private void uploadImageToFirebase(String caption, String location) { // Updated method signature
         if (selectedImageUri != null) {
+            uploadProgressBar.setVisibility(View.VISIBLE);
             String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
             StorageReference fileReference = storageReference.child("posts/" + userId + "/" + selectedImageUri.getLastPathSegment());
             fileReference.putFile(selectedImageUri)
                     .addOnSuccessListener(taskSnapshot -> fileReference.getDownloadUrl().addOnSuccessListener(uri -> {
                         String imageUrl = uri.toString();
                         savePostToFirestore(caption, location, imageUrl); // Pass location to Firestore method
+                        uploadProgressBar.setVisibility(View.GONE);
                     }))
                     .addOnFailureListener(e -> {
+                        uploadProgressBar.setVisibility(View.GONE);
                         Toast.makeText(requireContext(), "Upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     });
         } else {
+            uploadProgressBar.setVisibility(View.GONE);
             Toast.makeText(requireContext(), "Please select an image to upload", Toast.LENGTH_SHORT).show();
         }
     }
