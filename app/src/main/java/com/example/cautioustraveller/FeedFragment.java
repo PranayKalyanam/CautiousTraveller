@@ -91,7 +91,7 @@ public class FeedFragment extends Fragment {
                 });
     }
 
-    private static class LoadImageTask extends AsyncTask<String, Void, Bitmap> {
+    public static class LoadImageTask extends AsyncTask<String, Void, Bitmap> {
         private final WeakReference<ImageView> imageViewReference;
 
         LoadImageTask(ImageView imageView) {
