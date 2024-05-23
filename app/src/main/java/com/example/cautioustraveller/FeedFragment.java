@@ -61,10 +61,12 @@ public class FeedFragment extends Fragment {
                                 String username = document.getString("username");
                                 String caption = document.getString("caption");
                                 String imageUrl = document.getString("imageUrl");
+                                String location = document.getString("location");
 
                                 View postView = getLayoutInflater().inflate(R.layout.item_post, null);
                                 TextView userNameTextView = postView.findViewById(R.id.username_text_view);
                                 TextView captionTextView = postView.findViewById(R.id.caption_text_view);
+                                TextView locationTextView = postView.findViewById(R.id.location_text_view);
                                 ImageView postImageView = postView.findViewById(R.id.post_image_view);
 
                                 if (username != null) {
@@ -75,6 +77,9 @@ public class FeedFragment extends Fragment {
                                 }
                                 if (imageUrl != null) {
                                     new LoadImageTask(postImageView).execute(imageUrl);
+                                }
+                                if (location != null) {
+                                    locationTextView.setText(location);
                                 }
 
                                 feedLayout.addView(postView);
